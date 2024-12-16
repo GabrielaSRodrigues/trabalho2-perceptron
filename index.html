@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Recognition with Perceptron - Gabriela </title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js'></script>
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+            gap: 2px;
+        }
+        .grid input[type="checkbox"] {
+            width: 30px;
+            height: 30px;
+        }
+        .container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>Letter Recognition with Perceptron</h1>
+        <div class="grid" id="matrix">
+        </div>
+        <button class="btn btn-primary" onclick="submitMatrix()">Submit Matrix</button>
+
+    </div>
+    
+
+    <script>
+        const matrixSize = 10;
+
+        // Initialize the grid of checkboxes
+        const grid = document.getElementById('matrix');
+        for (let i = 0; i < matrixSize; i++) {
+            for (let j = 0; j < matrixSize; j++) {
+                let checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `cell-${i}-${j}`;
+                grid.appendChild(checkbox);
+            }
+        }
+        grid.appendChild(document.createElement('br'));
+
+        // Function to collect matrix data and send it to the server
+        function submitMatrix() {
+            let matrix = [];
+            for (let i = 0; i < matrixSize; i++) {
+                let row = [];
+                for (let j = 0; j < matrixSize; j++) {
+                    let checkbox = document.getElementById(`cell-${i}-${j}`);
+                    row.push(checkbox.checked ? 1 : 0);
+                }
+                matrix.push(row);
+            }
+
+            fetch('http://127.0.0.1:3000/recognition_perceptron', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ matrix: matrix })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(`Recognized letter: ${data.letter}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        }
+    </script>
+</body>
+</html>
+
